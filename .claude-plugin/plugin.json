@@ -1,0 +1,11 @@
+{
+  "name": "code-slowmo",
+  "displayName": "code-slowmo",
+  "version": "0.1.0",
+  "description": "Understand code by watching it run in slow motion: interactive system maps, step-by-step timelines and line-by-line code runs, written in plain language.",
+  "author": { "name": "precious112", "url": "https://github.com/precious112" },
+  "homepage": "https://github.com/precious112/code-slowmo",
+  "repository": "https://github.com/precious112/code-slowmo",
+  "license": "MIT",
+  "keywords": ["explain", "visualization", "learning", "onboarding", "architecture", "code-walkthrough", "skill"]
+}

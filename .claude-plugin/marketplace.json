@@ -1,0 +1,12 @@
+{
+  "name": "code-slowmo",
+  "description": "Interactive, plain-language visual explainers for any codebase.",
+  "owner": { "name": "precious112", "url": "https://github.com/precious112" },
+  "plugins": [
+    {
+      "name": "code-slowmo",
+      "source": "./",
+      "description": "Understand code by watching it run in slow motion: system maps, step-by-step timelines and line-by-line runs of real code, written in plain language."
+    }
+  ]
+}
