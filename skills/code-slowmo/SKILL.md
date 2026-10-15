@@ -6,6 +6,7 @@ compatibility: Needs Python 3.8 or newer to build pages. The finished page is a 
 metadata:
   author: precious112
   version: "0.1.0"
+  opencode/slash: "true"
 ---
 
 # code-slowmo

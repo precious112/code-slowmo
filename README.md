@@ -29,7 +29,21 @@ The result is one HTML file. It opens in any browser and needs no server or acco
 npx skills add precious112/code-slowmo
 ```
 
-**By hand:** copy `skills/code-slowmo/` into your agent's skills folder. For Claude Code that is `~/.claude/skills/`.
+**OpenCode**
+
+Install it for one project (run this in the project folder):
+```
+npx skills add precious112/code-slowmo -a opencode
+```
+Or install it for every project:
+```
+npx skills add precious112/code-slowmo -a opencode -g
+```
+OpenCode finds the skill on its own. Ask a question about your code, or type `/code-slowmo`. If your `opencode.json` limits skills with `permission.skill`, allow `code-slowmo` there.
+
+To install without npx, copy `skills/code-slowmo/` to `.opencode/skills/code-slowmo/` in your project, or to `~/.config/opencode/skills/code-slowmo/` for every project.
+
+**By hand, for any agent:** copy `skills/code-slowmo/` into your agent's skills folder. For Claude Code that is `~/.claude/skills/`.
 
 You need Python 3.8 or newer, which the agent uses to build the page.
 
