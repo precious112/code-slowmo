@@ -147,6 +147,30 @@ def structure_errors(page):
     return errs
 
 
+NUMBER_WORDS = {"two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+                "eleven": 11, "twelve": 12}
+COUNTED = {"glossary": [("items", r"words?|cards?|terms?")],
+           "map": [("areas", r"areas?|regions?"), ("parts", r"parts?|pieces?"), ("tour", r"(?:tour )?steps?|stops?")],
+           "flow": [("steps", r"steps?|messages?|arrows?"), ("lanes", r"lanes?|columns?")],
+           "trace": [("steps", r"steps?")], "compare": [("steps", r"steps?")]}
+
+
+def count_warnings(page):
+    """Warn when an intro states a count ("Six areas") that doesn't match what the section holds."""
+    import re
+    warns = []
+    for i, s in enumerate(page.get("sections") or []):
+        text = " ".join(x if isinstance(x, str) else "" for x in ([s.get("intro")] if isinstance(s.get("intro"), str) else (s.get("intro") or [])))
+        for field, noun in COUNTED.get(s.get("type"), []):
+            n = len(s.get(field) or [])
+            for m in re.finditer(r"\b(\d+|" + "|".join(NUMBER_WORDS) + r")\s+(?:[a-z-]+\s+)?(" + noun + r")\b", text, re.I):
+                said = m.group(1).lower()
+                said = int(said) if said.isdigit() else NUMBER_WORDS[said]
+                if said != n:
+                    warns.append(f"$.sections[{i}].intro says \"{m.group(0)}\" but the section has {n} {field}.")
+    return warns
+
+
 def main(argv):
     args = [a for a in argv[1:] if not a.startswith("--")]
     force = "--force" in argv
@@ -164,6 +188,7 @@ def main(argv):
 
     serr = structure_errors(page)
     terr, twarn = check_text.check(page)
+    twarn = count_warnings(page) + twarn
     for e in serr:
         print("ERROR ", e)
     for e in terr:

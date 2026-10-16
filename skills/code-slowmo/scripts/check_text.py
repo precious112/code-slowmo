@@ -44,6 +44,7 @@ JARGON = [
     "subscribes", "subscriber", "subscribers", "thunk", "saga", "observable", "debounce", "debounced", "throttle",
     "throttled", "polyfill", "transpile", "bundler", "runtime", "middleware", "endpoint", "handler", "instantiate",
     "singleton", "invariant", "heuristic", "abstraction", "orm", "mutex", "semaphore", "coroutine", "goroutine",
+    "api", "apis", "headless", "sdk", "daemon", "rpc", "ipc", "websocket", "stdin", "stdout", "uds", "jsonl",
 ]
 PASSIVE = re.compile(r"\b(is|are|was|were|be|been|being|gets|got)\s+(\w+ed|built|made|done|sent|run|set|kept|held|thrown|written|drawn|shown|given|taken|found|read)\b", re.I)
 NOTE_THAT = re.compile(r"(^|[.!?]\s+)(please\s+)?note that\b", re.I)

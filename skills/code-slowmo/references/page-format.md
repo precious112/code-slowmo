@@ -8,7 +8,8 @@ A page is one JSON file. `scripts/build.py page.json page.html` checks it and bu
 2. Text you can format
 3. Sections: glossary, text, map, flow, trace, compare, custom
 4. Screens and state
-5. Links to a step
+5. What the reader sees
+6. Links to a step
 
 ## 1. Top level
 
@@ -148,6 +149,15 @@ Both `screen` and `state` carry forward: a step without them shows the last ones
 
 The page highlights changed `state` values on its own. You can also add `scr-hot` to the part of a screen that just changed.
 
-## 5. Links to a step
+## 5. What the reader sees, so you can refer to it
+
+When intro text tells the reader what to click, use these exact names:
+- **Map:** a toggle labelled **Areas** (the zoomed-out view, shown first) and **Parts** (the detailed view). The reader clicks an area or a part to read about it in the side panel. With a `tour`, the step bar below the map moves through it.
+- **Every stepped section:** a step bar with **Next**, Previous, Back to the first step, Play, and a slider. The arrow keys also move one step.
+- **Hover:** code names with a dotted underline show their plain explanation.
+
+Don't name controls that aren't listed here.
+
+## 6. Links to a step
 
 Every stepped section can be linked to: `page.html#<section-id>-<step number>`, such as `#trace-14`. The reader's position updates the address as they step, so they can share the exact step.

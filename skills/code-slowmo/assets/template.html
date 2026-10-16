@@ -527,6 +527,28 @@ function renderMap(s, i){
     const c1 = { x:p.x + DIR[p.s][0]*d, y:p.y + DIR[p.s][1]*d }, c2 = { x:q.x + DIR[q.s][0]*d, y:q.y + DIR[q.s][1]*d };
     return `M${p.x} ${p.y}C${c1.x} ${c1.y} ${c2.x} ${c2.y} ${q.x} ${q.y}`;
   }
+  // a vertical link that would cut through other boxes goes around them, through the nearest gap
+  const gutterUse = {};
+  function route(p, q, l, boxes){
+    const vertical = (p.s === "b" && q.s === "t") || (p.s === "t" && q.s === "b");
+    if (!vertical) return curve(p, q);
+    const yTop = Math.min(p.y, q.y), yBot = Math.max(p.y, q.y);
+    const others = Object.entries(boxes).filter(([id]) => id !== l.from && id !== l.to).map(([, b]) => b)
+      .filter(b => b.y < yBot - 2 && b.y + b.h > yTop + 2);
+    const blocks = x => others.some(b => x > b.x - 4 && x < b.x + b.w + 4);
+    const xMid = (p.x + q.x) / 2;
+    const steps = 30, line = t => p.x + (q.x - p.x) * t;
+    let clear = true; for (let k = 1; k < steps; k++) { if (blocks(line(k/steps))) { clear = false; break; } }
+    if (clear) return curve(p, q);
+    const cands = [PAD/2, W - PAD/2];
+    others.forEach(b => { cands.push(b.x - GAP/2, b.x + b.w + GAP/2); });
+    const ok = cands.filter(x => x >= PAD/2 && x <= W - PAD/2 && !blocks(x)).sort((u, v) => Math.abs(u - xMid) - Math.abs(v - xMid));
+    if (!ok.length) return curve(p, q);
+    const key = Math.round(ok[0]); const used = (gutterUse[key] = (gutterUse[key] || 0) + 1) - 1;
+    const gx = ok[0] + (used ? (used % 2 ? 1 : -1) * Math.ceil(used/2) * 7 : 0), dir = q.y > p.y ? 1 : -1, r = 16;
+    return `M${p.x} ${p.y} C${p.x} ${p.y + dir*r*1.6} ${gx} ${p.y + dir*r*0.4} ${gx} ${p.y + dir*r*2}` +
+           ` L${gx} ${q.y - dir*r*2} C${gx} ${q.y - dir*r*0.4} ${q.x} ${q.y - dir*r*1.6} ${q.x} ${q.y}`;
+  }
   function arrow(g, path, atStart){
     const len = path.getTotalLength();
     const tip = path.getPointAtLength(atStart ? 0 : len), back = path.getPointAtLength(atStart ? 7 : len - 7);
@@ -541,7 +563,7 @@ function renderMap(s, i){
     list.forEach((l, k) => {
       const pp = pts[k]; if (!pp || !pp.from || !pp.to) return;
       const g = el("g", { class:cls, "data-l": l.id || ("l"+k), style: roleStyle(l.role) }, layer);
-      const path = el("path", { d: curve(pp.from, pp.to) }, g);
+      const path = el("path", { d: route(pp.from, pp.to, l, boxes) }, g);
       arrow(g, path, false); if (l.both) arrow(g, path, true);
       drawn.push({ l, g, m: path.getPointAtLength(path.getTotalLength()/2), pair: [l.from, l.to].sort().join("|") });
     });
@@ -550,7 +572,20 @@ function renderMap(s, i){
       if (!d.l.label) return;
       const partner = drawn.find(o => o !== d && o.pair === d.pair);
       const left = partner && (d.m.x < partner.m.x || (d.m.x === partner.m.x && d.m.y < partner.m.y));
-      el("text", { x: left ? d.m.x - 6 : d.m.x + 6, y: d.m.y + 4, "text-anchor": left ? "end" : "start" }, d.g, d.l.label);
+      const x = left ? d.m.x - 6 : d.m.x + 6, y = d.m.y + 4, w = d.l.label.length * 6.3;
+      d.box = { x1: left ? x - w : x, x2: left ? x : x + w, y1: y - 11, y2: y + 3 };
+      d.t = el("text", { x, y, "text-anchor": left ? "end" : "start" }, d.g, d.l.label);
+    });
+    // move a label down when it would sit on top of an earlier one
+    const placed = [];
+    drawn.filter(d => d.t).forEach(d => {
+      for (let guard = 0; guard < 8; guard++) {
+        const hit = placed.find(o => d.box.x1 < o.box.x2 + 4 && o.box.x1 < d.box.x2 + 4 && d.box.y1 < o.box.y2 + 2 && o.box.y1 < d.box.y2 + 2);
+        if (!hit) break;
+        const dy = hit.box.y2 + 3 - d.box.y1; d.box.y1 += dy; d.box.y2 += dy;
+        d.t.setAttribute("y", +d.t.getAttribute("y") + dy);
+      }
+      placed.push(d);
     });
   }
   links.forEach((l,k) => { if (!l.id) l.id = "l"+k; });
@@ -624,7 +659,8 @@ function renderFlow(s, i){
   const L = Object.fromEntries(lanes.map(l => [l.id, l]));
   const laneW = Math.max(108, ...lanes.map(l => l.name.length*7.6 + 26));
   const X = {}; lanes.forEach((l,k) => X[l.id] = 40 + laneW/2 + k*laneW);
-  const top = 64, row = 42, W = 40 + laneW*lanes.length + 30, H = top + M.length*row + 16;
+  const loopRight = Math.max(0, ...M.filter(m => m.from === m.to && X[m.from] != null).map(m => X[m.from] + 32 + String(m.label).length*6.4 + 12));
+  const top = 64, row = 42, W = Math.max(40 + laneW*lanes.length + 30, loopRight), H = top + M.length*row + 16;
   const svg = el("svg", { viewBox:`0 0 ${W} ${H}`, role:"img", "aria-label": s.alt || s.title || "Sequence of messages" }, $(".flow", demo));
   lanes.forEach(l => {
     const x = X[l.id];

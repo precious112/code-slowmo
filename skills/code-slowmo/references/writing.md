@@ -105,5 +105,8 @@ Before building, read every step as if you had never seen the code:
 - Is every code name, file name and technical word explained, or replaced with a plain word?
 - Did you invent any label? Replace it with what it is.
 - Can any sentence be shorter and still say the same thing?
+- Is every "never", "always", "only" or "every" true on every platform and every code path? Check it in the code, or soften it ("on macOS and Linux…").
+- Do the numbers you state ("six areas", "ten steps") match what is on the page? The build warns when they don't.
+- Do you only tell the reader to press buttons that exist? See page-format.md, section 5.
 
 If any answer is "no", rewrite before you build.
