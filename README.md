@@ -2,6 +2,8 @@
 
 **Understand code by watching it run in slow motion.**
 
+https://github.com/user-attachments/assets/183da761-51d4-449c-8c34-f6bf3ba143d0
+
 Ask your coding agent how something works and you usually get a wall of text. code-slowmo is a skill that makes your agent build an interactive page instead:
 
 - **A system map.** It shows the main parts and which parts talk to each other. Click an area to see its parts, or follow a guided tour of one action.
