@@ -4,6 +4,8 @@
 
 https://github.com/user-attachments/assets/183da761-51d4-449c-8c34-f6bf3ba143d0
 
+*This launch film was made with [demo-director](https://github.com/precious112/demo-director), a skill that plans and renders product demo videos from code.*
+
 Ask your coding agent how something works and you usually get a wall of text. code-slowmo is a skill that makes your agent build an interactive page instead:
 
 - **A system map.** It shows the main parts and which parts talk to each other. Click an area to see its parts, or follow a guided tour of one action.
@@ -20,15 +22,16 @@ The result is one HTML file. It opens in any browser and needs no server or acco
 
 ## Install
 
-**Claude Code**
+**Claude Code, Codex, Cursor and other agents that support skills**
+```
+npx skills add precious112/code-slowmo
+```
+To pick the agent yourself, add `-a`, for example `-a claude-code`.
+
+**Claude Code, as a plugin**
 ```
 /plugin marketplace add precious112/code-slowmo
 /plugin install code-slowmo@code-slowmo
-```
-
-**Codex, Cursor and other agents that support skills**
-```
-npx skills add precious112/code-slowmo
 ```
 
 **OpenCode**
